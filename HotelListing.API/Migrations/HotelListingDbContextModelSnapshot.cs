@@ -16,18 +16,18 @@ namespace HotelListing.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "7.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("HotelListing.API.Data.Country", b =>
                 {
-                    b.Property<int>("CountryId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -37,26 +37,26 @@ namespace HotelListing.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CountryId");
+                    b.HasKey("Id");
 
                     b.ToTable("Countries");
 
                     b.HasData(
                         new
                         {
-                            CountryId = 1,
+                            Id = 1,
                             Name = "Jamaica",
                             ShortName = "JM"
                         },
                         new
                         {
-                            CountryId = 2,
+                            Id = 2,
                             Name = "Bahamas",
                             ShortName = "BS"
                         },
                         new
                         {
-                            CountryId = 3,
+                            Id = 3,
                             Name = "Cayman Island",
                             ShortName = "CI"
                         });
@@ -68,7 +68,7 @@ namespace HotelListing.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -81,9 +81,8 @@ namespace HotelListing.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Rating")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("Rating")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -98,7 +97,7 @@ namespace HotelListing.API.Migrations
                             Address = "Negril",
                             CountryId = 1,
                             Name = "Sandals Resort and Spa",
-                            Rating = "4.5"
+                            Rating = 4.5
                         },
                         new
                         {
@@ -106,7 +105,7 @@ namespace HotelListing.API.Migrations
                             Address = "George Town",
                             CountryId = 3,
                             Name = "Confort Suites",
-                            Rating = "4.3"
+                            Rating = 4.2999999999999998
                         },
                         new
                         {
@@ -114,7 +113,7 @@ namespace HotelListing.API.Migrations
                             Address = "Nassua",
                             CountryId = 2,
                             Name = "Grand Palldium",
-                            Rating = "4"
+                            Rating = 4.0
                         });
                 });
 
