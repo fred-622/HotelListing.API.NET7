@@ -15,17 +15,19 @@ namespace HotelListing.API.Repository
         private readonly IMapper _mapper;
         private readonly UserManager<ApiUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthManager> _logger;
 
         //vid 58
         private ApiUser _user;
         private const string _loginProvider = "HotelListingApi";
         private const string _refreshToken = "RefreshToken";
 
-        public AuthManager(IMapper mapper, UserManager<ApiUser> userManager, IConfiguration configuration)
+        public AuthManager(IMapper mapper, UserManager<ApiUser> userManager, IConfiguration configuration, ILogger<AuthManager> logger)
         {
             this._mapper = mapper;
             this._userManager = userManager;
             this._configuration = configuration;
+            this._logger = logger;
         }
 
         // add vid 58
@@ -44,14 +46,20 @@ namespace HotelListing.API.Repository
 
         public async Task<AuthResponseDto> Login(LoginDto loginDto)
         {
+            // vid 62 logger
+            _logger.LogInformation($"Looking for user with email: {loginDto.Email}");
+
             _user = await _userManager.FindByEmailAsync(loginDto.Email);
             bool isValidUser = await _userManager.CheckPasswordAsync(_user, loginDto.Password);
 
             if (_user == null || isValidUser == false)
             {
+                _logger.LogWarning($"User with email : {loginDto.Email} was not found");
                 return null;
             }
             var token = await GenerateToken();
+            
+            _logger.LogInformation($"Token generated susscesfully for : {loginDto.Email}. | Token: {token}");
 
             return new AuthResponseDto
             {
@@ -90,20 +98,20 @@ namespace HotelListing.API.Repository
             _user = await _userManager.FindByNameAsync(username);
 
             // check user actually exist
-            if (_user ==null || _user.Id != request.UserId)
+            if (_user == null || _user.Id != request.UserId)
             {
                 return null;
             }
             // we have a valid user so get & check token in Db
-            var isValidRefreshToken = await _userManager.VerifyUserTokenAsync(_user, _loginProvider, 
+            var isValidRefreshToken = await _userManager.VerifyUserTokenAsync(_user, _loginProvider,
                 _refreshToken, request.Token);
-            
+
             // check token match with user
             if (isValidRefreshToken) // true
             {
                 // get a token made
                 var token = await GenerateToken();
-                
+
                 // return token
                 return new AuthResponseDto
                 {

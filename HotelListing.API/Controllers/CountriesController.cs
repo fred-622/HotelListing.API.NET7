@@ -10,6 +10,7 @@ using HotelListing.API.Models.Country;
 using AutoMapper;
 using HotelListing.API.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using HotelListing.API.Exceptions;
 
 namespace HotelListing.API.Controllers
 {
@@ -21,11 +22,13 @@ namespace HotelListing.API.Controllers
         // added from vid 33
         private readonly IMapper _mapper;
         private readonly ICountriesRepository _countriesRepository;
+        private readonly ILogger<CountriesController> _logger;
 
-        public CountriesController(IMapper mapper, ICountriesRepository countriesRepository)
-        {
+        public CountriesController(IMapper mapper, ICountriesRepository countriesRepository, ILogger<CountriesController> logger)
+        { 
             this._mapper = mapper;
             this._countriesRepository = countriesRepository;
+            this._logger = logger;
         }
 
         // GET: api/Countries
@@ -50,7 +53,10 @@ namespace HotelListing.API.Controllers
 
             if (country == null)
             {
-                return NotFound(); //404
+                throw new NotFoundException("Get Country", id);
+                //throw new NotFoundException(nameof(GetCountry), id); // used for testing only
+                //_logger.LogWarning($"No record found in {nameof(GetCountry)} with Id: {id}");
+                //return NotFound(); //404
             }
 
             var countryDto = _mapper.Map<CountryDto>(country);
@@ -73,9 +79,11 @@ namespace HotelListing.API.Controllers
 
             //_context.Entry(country).State = EntityState.Modified;
             var country = await _countriesRepository.GetAsync(id);
+            
             if (country == null)
             {
-                return NotFound(); //404
+                throw new NotFoundException(nameof(PutCountry), id); // used for testing only
+                //return NotFound(); //404
             }
 
             // Map the updateCountryDto to country to update Db
@@ -124,7 +132,8 @@ namespace HotelListing.API.Controllers
             var country = await _countriesRepository.GetAsync(id);
             if (country == null)
             {
-                return NotFound(); //404
+                throw new NotFoundException(nameof(DeleteCountry), id); // used for testing only
+                //return NotFound(); //404
             }
 
             await _countriesRepository.DeleteAsync(id);
